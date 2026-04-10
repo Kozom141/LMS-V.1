@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>레만살 도구함 │ 환생플래너</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="exp.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800;900&display=swap');
+        
+        body {
+            font-family: 'Pretendard', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e2937 100%);
+            color: #e2e8f0;
+            min-height: 100vh;
+        }
+        
+        .top-header {
+            background: #0a0f1c;
+            border-bottom: 2px solid #22d3ee;
+            box-shadow: 0 0 30px rgba(34, 211, 238, 0.5);
+        }
+        
+        .input-card {
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(148, 163, 184, 0.25);
+            border-radius: 28px;
+            box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.6);
+        }
+        
+        .result-card {
+            background: linear-gradient(145deg, #1e2937, #0f172a);
+            border: 2px solid #eab308;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px -15px rgba(234, 179, 8, 0.3);
+        }
+        
+        /* 우주 배경 (추천 레벨 박스 전용) */
+        .space-bg {
+            background: #0a0a1f;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .space-bg::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(255,255,255,0.08) 1px, transparent 2px),
+                radial-gradient(circle at 50% 70%, rgba(255,255,255,0.07) 1px, transparent 2px),
+                radial-gradient(circle at 80% 40%, rgba(255,255,255,0.09) 1px, transparent 2px),
+                radial-gradient(circle at 30% 80%, rgba(255,255,255,0.06) 1px, transparent 2px);
+            background-size: 120px 120px;
+            animation: starsMove 90s linear infinite;
+            opacity: 0.85;
+        }
+        
+        @keyframes starsMove {
+            from { background-position: 0 0; }
+            to { background-position: 250px 250px; }
+        }
+        
+        .custom-field {
+            background: rgba(30, 41, 59, 0.9);
+            border: 2px solid #475569;
+            color: #f1f5f9;
+            border-radius: 18px;
+            padding: 16px 18px;
+            font-weight: 700;
+            font-size: 1.15rem;
+        }
+        
+        /* EPM 입력창 - 숫자 5자리 이상도 완전 표시 */
+        .epm-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+        }
+        
+        .epm-input {
+            text-align: center;
+            font-size: 1.85rem;
+            font-weight: 800;
+            height: 88px;
+            color: #ffffff !important;
+            background: #1e2937 !important;
+            border: 2px solid #64748b;
+            padding: 12px 8px;
+        }
+        
+        .epm-label {
+            position: absolute;
+            bottom: -26px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.85rem;
+            font-weight: 900;
+            color: #94a3b8;
+        }
+        
+        /* 총 EPM 요약 */
+        .epm-summary {
+            background: rgba(30, 41, 59, 0.85);
+            border: 2px solid #67e8f9;
+            border-radius: 16px;
+            padding: 14px 20px;
+            margin-top: 24px; /* 겹침 방지 */
+        }
+        
+        /* 타임보스 강조 */
+        .boss-check-item {
+            background: rgba(30, 41, 59, 0.9);
+            border: 2px solid #475569;
+            border-radius: 16px;
+            transition: all 0.3s ease;
+            font-weight: 700;
+        }
+        
+        .boss-check-item.active {
+            background: linear-gradient(90deg, #7c3aed, #22d3ee);
+            border-color: #67e8f9;
+            color: white;
+            box-shadow: 0 0 30px rgba(103, 232, 249, 0.7);
+            transform: scale(1.08);
+        }
+        
+        .tab-btn {
+            padding: 1.1rem;
+            font-weight: 700;
+            transition: all 0.3s ease;
+        }
+        
+        .tab-btn.active {
+            background: rgba(255,255,255,0.15);
+            color: #ffffff;
+            box-shadow: 0 0 20px rgba(103, 232, 249, 0.5);
+            border: 1px solid #67e8f9;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8 pb-32">
+<div class="max-w-6xl mx-auto">
+    <!-- Header -->
+    <header class="top-header flex flex-col md:flex-row items-center justify-between mb-10 p-6 rounded-3xl border border-cyan-900">
+        <div class="flex items-center gap-4">
+            <div class="text-5xl drop-shadow-[0_0_15px_#22d3ee]">🍁</div>
+            <div>
+                <h1 class="text-3xl md:text-4xl font-black tracking-tighter text-white">레만살 환생플래너</h1>
+                <p class="text-cyan-300 text-sm font-medium">Made by 짱돌&GPT</p>
+            </div>
+        </div>
+        <button onclick="goToMenu()" class="px-7 py-3.5 bg-slate-800 hover:bg-slate-700 border border-slate-600 text-white font-bold rounded-2xl transition-all flex items-center gap-2">
+            ← 메뉴로 나가기
+        </button>
+    </header>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <!-- Input Section -->
+        <div class="lg:col-span-4 space-y-6">
+            <div class="input-card p-8">
+                <h2 class="text-xl font-black mb-8 flex items-center gap-3 text-white">⚙️ 데이터 입력</h2>
+                
+                <div class="space-y-8">
+                    <div class="grid grid-cols-2 gap-5">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-400 mb-2">현재 레벨</label>
+                            <input type="number" id="curLevel" value="1" min="1" class="custom-field w-full">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-sky-400 mb-2">목표 레벨</label>
+                            <input type="number" id="targetLevel" value="100" min="2" max="2000" class="custom-field w-full">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-5">
+                        <div>
+                            <label class="block text-xs font-bold text-emerald-400 mb-2">잔여 환생 횟수</label>
+                            <input type="number" id="curRebirthCount" value="10" min="1" class="custom-field w-full">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-amber-400 mb-2">SP 보너스 (%)</label>
+                            <div class="relative">
+                                <input type="number" id="spBuffPercent" value="0" class="custom-field w-full">
+                                <span class="absolute right-6 top-1/2 -translate-y-1/2 text-slate-400 font-bold">%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-orange-400 mb-3">플레이 가능 시간</label>
+                        <div class="grid grid-cols-2 gap-5">
+                            <div class="relative">
+                                <input type="number" id="limitHour" value="1" class="custom-field w-full">
+                                <span class="absolute right-6 top-1/2 -translate-y-1/2 text-slate-400">시간</span>
+                            </div>
+                            <div class="relative">
+                                <input type="number" id="limitMin" value="0" class="custom-field w-full">
+                                <span class="absolute right-6 top-1/2 -translate-y-1/2 text-slate-400">분</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-red-400 mb-3">타임보스 시간</label>
+                        <div class="grid grid-cols-3 gap-3">
+                            <div class="boss-check-item text-center py-5 cursor-pointer" id="btn-900" onclick="setBoss(900)">900초</div>
+                            <div class="boss-check-item text-center py-5 cursor-pointer" id="btn-1200" onclick="setBoss(1200)">1200초</div>
+                            <div class="boss-check-item text-center py-5 cursor-pointer" id="btn-1500" onclick="setBoss(1500)">1500초</div>
+                        </div>
+                    </div>
+
+                    <!-- EPM -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-400 mb-4">분당 경험치 (EPM)</label>
+                        <div class="epm-grid">
+                            <div class="relative">
+                                <input type="number" id="epmJo" value="0" class="custom-field epm-input w-full">
+                                <span class="epm-label">조</span>
+                            </div>
+                            <div class="relative">
+                                <input type="number" id="epmEok" value="0" class="custom-field epm-input w-full">
+                                <span class="epm-label">억</span>
+                            </div>
+                            <div class="relative">
+                                <input type="number" id="epmMan" value="0" class="custom-field epm-input w-full">
+                                <span class="epm-label">만</span>
+                            </div>
+                        </div>
+                        
+                        <div class="epm-summary">
+                            <p class="text-xs font-bold text-cyan-300 mb-1">현재 입력된 총 분당 경험치</p>
+                            <p id="totalEpmDisplay" class="text-2xl font-black text-white">0</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Result Area -->
+        <div class="lg:col-span-8 space-y-6">
+            <div class="flex bg-slate-900/80 backdrop-blur-xl rounded-3xl p-1.5 border border-slate-700 mb-8">
+                <button onclick="switchTab('analytics')" id="tab-analytics" class="tab-btn flex-1 rounded-3xl active">환생 계산기</button>
+                <button onclick="switchTab('optimizer')" id="tab-optimizer" class="tab-btn flex-1 rounded-3xl">최적의 환생 레벨</button>
+            </div>
+
+            <!-- Analytics -->
+            <div id="content-analytics" class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="result-card p-7">
+                        <p class="text-xs font-black text-amber-300 uppercase">총 환생 소요 시간</p>
+                        <p id="resTotalTime" class="text-4xl font-black mt-3 text-white">-</p>
+                        <p id="resTimeDesc" class="text-sm text-slate-400 mt-2"></p>
+                    </div>
+                    <div class="result-card p-7">
+                        <p class="text-xs font-black text-amber-300 uppercase">누적 기대 SP</p>
+                        <p id="totalSpExpectation" class="text-4xl font-black mt-3 text-emerald-400">-</p>
+                        <p id="resSpDesc" class="text-sm text-slate-400 mt-2"></p>
+                    </div>
+                </div>
+
+                <div class="result-card p-7">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <p class="text-xs font-bold text-slate-400">목표 레벨</p>
+                            <p id="resTargetLevelDisplay" class="text-4xl font-black text-cyan-300">Lv. -</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-xs font-bold text-slate-400">잔여 환생 횟수</p>
+                            <p id="resRebirthDisplay" class="text-3xl font-black">- 회</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Optimizer -->
+            <div id="content-optimizer" class="hidden space-y-6">
+                <div class="result-card p-8">
+                    <h3 class="text-2xl font-black mb-6 text-white">시간 내 최대 효율 분석</h3>
+                    
+                    <div class="grid grid-cols-3 gap-4">
+                        <div class="bg-slate-800/80 rounded-2xl p-6 text-center">
+                            <p class="text-xs text-slate-400">총 예상 SP</p>
+                            <p id="optTotalSp" class="text-3xl font-black text-emerald-400 mt-2">-</p>
+                        </div>
+                        <div class="bg-slate-800/80 rounded-2xl p-6 text-center">
+                            <p class="text-xs text-slate-400">회당 허용 시간</p>
+                            <p id="optAllowedTimePer" class="text-3xl font-bold text-orange-400 mt-2">-</p>
+                        </div>
+                        <div class="bg-slate-800/80 rounded-2xl p-6 text-center">
+                            <p class="text-xs text-slate-400">최종 소요 시간</p>
+                            <p id="optTotalTime" class="text-3xl font-black text-cyan-300 mt-2">-</p>
+                        </div>
+                    </div>
+
+                    <div class="space-bg result-card p-10 text-center rounded-3xl mt-8 border border-cyan-400">
+                        <p class="uppercase text-xs tracking-widest text-orange-400 font-bold">추천 최적 환생 레벨</p>
+                        <h4 id="optResultLevel" class="text-6xl font-black mt-6 mb-8 text-white">Lv. -</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let activeBossTime = 0;
+
+    function getExpForLevel(lv) {
+        if (lv <= 0) return 0n;
+        try {
+            const source = window.expData || (typeof expData !== 'undefined' ? expData : null);
+            if (source && source.exp && Array.isArray(source.exp)) {
+                const val = source.exp[lv];
+                if (val !== undefined) return BigInt(val.toString().replace(/,/g, ''));
+            }
+        } catch(e) {}
+        return BigInt(Math.floor(Math.pow(lv, 2.8) * 500000));
+    }
+
+    function formatBigInt(val) {
+        let b = BigInt(val);
+        if (b === 0n) return "0";
+        const j = b / 1000000000000n; b %= 1000000000000n;
+        const e = b / 100000000n; b %= 100000000n;
+        const m = b / 10000n;
+        let str = "";
+        if (j > 0) str += j + "조 ";
+        if (e > 0) str += e + "억 ";
+        if (m > 0) str += m + "만 ";
+        return str.trim() || "0";
+    }
+
+    function formatTime(seconds) {
+        if (seconds <= 0) return "0초";
+        let s = Math.round(seconds);
+        const d = Math.floor(s / 86400); s %= 86400;
+        const h = Math.floor(s / 3600); s %= 3600;
+        const m = Math.floor(s / 60); s %= 60;
+        let res = [];
+        if (d > 0) res.push(d + "일");
+        if (h > 0) res.push(h + "시간");
+        if (m > 0) res.push(m + "분");
+        if (s > 0 || res.length === 0) res.push(s + "초");
+        return res.join(" ");
+    }
+
+    function setBoss(sec) {
+        activeBossTime = (activeBossTime === sec) ? 0 : sec;
+        document.querySelectorAll('.boss-check-item').forEach(el => el.classList.remove('active'));
+        if (activeBossTime) document.getElementById('btn-' + activeBossTime).classList.add('active');
+        calculate();
+    }
+
+    function switchTab(tab) {
+        document.getElementById('content-analytics').classList.toggle('hidden', tab !== 'analytics');
+        document.getElementById('content-optimizer').classList.toggle('hidden', tab !== 'optimizer');
+        document.getElementById('tab-analytics').classList.toggle('active', tab === 'analytics');
+        document.getElementById('tab-optimizer').classList.toggle('active', tab === 'optimizer');
+    }
+
+    function calculate() {
+        const curLv = parseInt(document.getElementById('curLevel').value) || 1;
+        const tarLv = Math.min(2000, parseInt(document.getElementById('targetLevel').value) || 100);
+        const spBuff = 1 + (parseFloat(document.getElementById('spBuffPercent').value) || 0) / 100;
+        const rebirthCount = parseInt(document.getElementById('curRebirthCount').value) || 1;
+        const limitMins = (parseInt(document.getElementById('limitHour').value)||0)*60 + (parseInt(document.getElementById('limitMin').value)||0);
+
+        const j = BigInt(document.getElementById('epmJo').value||0) * 1000000000000n;
+        const e = BigInt(document.getElementById('epmEok').value||0) * 100000000n;
+        const m = BigInt(document.getElementById('epmMan').value||0) * 10000n;
+        const totalEpmBig = j + e + m;
+
+        document.getElementById('totalEpmDisplay').innerText = formatBigInt(totalEpmBig) || "0";
+
+        const bossWeight = activeBossTime > 0 ? ((activeBossTime * 1.5) + (3600 - activeBossTime)) / 3600 : 1;
+        const actualEps = (Number(totalEpmBig) / 60) * bossWeight;
+
+        let expOnce = 0n;
+        for (let i = curLv; i < tarLv; i++) expOnce += getExpForLevel(i);
+
+        const onceSeconds = actualEps > 0 ? Number(expOnce) / actualEps : 0;
+        const onceSp = Math.floor(tarLv * 3 * spBuff);
+
+        document.getElementById('resTotalTime').innerText = formatTime(onceSeconds * rebirthCount);
+        document.getElementById('resTimeDesc').innerText = `회당 약 ${formatTime(onceSeconds)}`;
+        document.getElementById('totalSpExpectation').innerText = (onceSp * rebirthCount).toLocaleString() + " SP";
+        document.getElementById('resSpDesc').innerText = `회당 ${onceSp.toLocaleString()} SP`;
+        document.getElementById('resTargetLevelDisplay').innerText = `Lv. ${tarLv}`;
+        document.getElementById('resRebirthDisplay').innerText = `${rebirthCount} 회`;
+
+        const allowedOnceSeconds = limitMins > 0 ? (limitMins * 60) / rebirthCount : 0;
+        let optLv = curLv, optExpTotal = 0n;
+        if (actualEps > 0 && limitMins > 0) {
+            for (let i = curLv; i < 2000; i++) {
+                const nxt = getExpForLevel(i);
+                if (Number(optExpTotal + nxt) / actualEps > allowedOnceSeconds) break;
+                optExpTotal += nxt; optLv = i + 1;
+            }
+        }
+
+        document.getElementById('optAllowedTimePer').innerText = formatTime(allowedOnceSeconds);
+        document.getElementById('optResultLevel').innerText = `Lv. ${optLv}`;
+        document.getElementById('optTotalSp').innerText = (Math.floor(optLv * 3 * spBuff) * rebirthCount).toLocaleString() + " SP";
+        document.getElementById('optTotalTime').innerText = formatTime((Number(optExpTotal) / actualEps) * rebirthCount);
+    }
+
+    function goToMenu() {
+        window.location.href = 'index.html';
+    }
+
+    window.onload = () => {
+        document.querySelectorAll('input').forEach(el => el.addEventListener('input', calculate));
+        setTimeout(calculate, 200);
+    };
+</script>
+</body>
+</html>
