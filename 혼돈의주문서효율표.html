@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>레만살 │ 혼돈의주문서</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800;900&display=swap');
+       
+        body {
+            font-family: 'Pretendard', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e2937 100%);
+            color: #e2e8f0;
+            min-height: 100vh;
+        }
+       
+        .main-header {
+            background: rgba(15, 23, 42, 0.95);
+            border: 2px solid #67e8f9;
+            box-shadow: 0 0 30px rgba(103, 232, 249, 0.3);
+        }
+       
+        .input-card {
+            background: rgba(15, 23, 42, 0.92);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(103, 232, 249, 0.3);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.7);
+        }
+       
+        .chaos-input {
+            width: 100%;
+            padding: 14px 16px;
+            background: rgba(30, 41, 59, 0.95);
+            border: 2px solid #475569;
+            border-radius: 16px;
+            text-align: center;
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: #f1f5f9;
+            transition: all 0.3s;
+        }
+       
+        .chaos-input:focus {
+            border-color: #67e8f9;
+            box-shadow: 0 0 0 4px rgba(103, 232, 249, 0.4);
+            outline: none;
+        }
+       
+        .result-percent {
+            font-size: 1.45rem;
+            font-weight: 900;
+        }
+       
+        .tab-btn {
+            padding: 14px 20px;
+            font-weight: 700;
+            transition: all 0.3s;
+            border-radius: 9999px;
+        }
+       
+        .tab-btn.active {
+            background: rgba(103, 232, 249, 0.2);
+            color: #67e8f9;
+            box-shadow: 0 0 15px rgba(103, 232, 249, 0.4);
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8 pb-32">
+<div class="max-w-5xl mx-auto">
+    <!-- Header -->
+    <header class="main-header flex items-center justify-between p-6 rounded-3xl mb-8">
+        <div class="flex items-center gap-4">
+            <div class="text-5xl">📜</div>
+            <div>
+                <h1 class="text-3xl md:text-4xl font-black tracking-tighter text-white">주문서 효율 계산기</h1>
+                <p class="text-cyan-300 text-sm">Chaos Scroll Efficiency Tool</p>
+            </div>
+        </div>
+        <button onclick="goToMenu()"
+                class="flex items-center gap-2 px-6 py-3 bg-slate-800 hover:bg-slate-700 border border-cyan-400 text-cyan-300 font-bold rounded-2xl transition-all">
+            ← 메뉴로 나가기
+        </button>
+    </header>
+
+    <div class="input-card p-8">
+        <div class="flex bg-slate-900/80 rounded-3xl p-1.5 border border-slate-700 mb-8">
+            <button onclick="switchChaosMode('normal')" id="tab-normal"
+                    class="tab-btn flex-1 text-base active">일반 지역 전용</button>
+            <button onclick="switchChaosMode('awakening')" id="tab-awakening"
+                    class="tab-btn flex-1 text-base">초월 지역 전용</button>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-left">
+                <thead>
+                    <tr class="text-xs text-slate-400 border-b border-slate-700">
+                        <th class="px-6 py-5 text-center">지역</th>
+                        <th class="px-6 py-5 text-center">현재 공격력</th>
+                        <th class="px-6 py-5 text-center">기본 수치</th>
+                        <th class="px-6 py-5 text-center">최대 수치</th>
+                        <th class="px-6 py-5 text-center">달성 효율</th>
+                    </tr>
+                </thead>
+                <tbody id="chaosTable" class="divide-y divide-slate-700"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    const CHAOS_DATA = {
+        awakening: [
+            { region: "리스항구", base: 1500, max: 3890 },
+            { region: "헤네시스", base: 1875, max: 4863 },
+            { region: "엘리니아", base: 2250, max: 5835 },
+            { region: "커닝시티", base: 2625, max: 6808 },
+            { region: "페리온", base: 2850, max: 7392 },
+            { region: "슬리피우드", base: 3075, max: 7975 },
+            { region: "골드비치", base: 3300, max: 8559 },
+            { region: "커닝스퀘어", base: 3525, max: 9142 },
+            { region: "버섯의성", base: 3750, max: 9726 },
+            { region: "엘리넬", base: 4125, max: 10669 },
+            { region: "옐로딘", base: 4350, max: 11282 }
+        ],
+        normal: [
+            { region: "미나르숲", base: 540, max: 1400 },
+            { region: "미나르계곡", base: 585, max: 1517 },
+            { region: "협곡", base: 630, max: 1634 },
+            { region: "아랫마을", base: 670, max: 1737 },
+            { region: "니할사막", base: 720, max: 1867 },
+            { region: "마가티아", base: 795, max: 2062 },
+            { region: "무릉도원", base: 870, max: 2256 },
+            { region: "황금사원", base: 945, max: 2451 },
+            { region: "테마파크", base: 1020, max: 2645 },
+            { region: "사자왕의성", base: 1110, max: 2879 },
+            { region: "콜로서스", base: 1200, max: 3112 },
+            { region: "신전", base: 1290, max: 3345 },
+            { region: "레헬른", base: 1425, max: 3696 },
+            { region: "츄츄아일랜드", base: 1575, max: 4085 },
+            { region: "미래의문", base: 1725, max: 4474 },
+            { region: "소멸의여로", base: 1875, max: 4863 },
+            { region: "아르카나", base: 2100, max: 5446 },
+            { region: "모라스", base: 2325, max: 6030 },
+            { region: "에스페라", base: 2550, max: 6614 },
+            { region: "문브릿지", base: 2775, max: 7197 },
+            { region: "고통의미궁", base: 3000, max: 7781 },
+            { region: "리멘", base: 3300, max: 8559 }
+        ]
+    };
+
+    let currentMode = 'normal';
+
+    function switchChaosMode(mode) {
+        currentMode = mode;
+        document.getElementById('tab-normal').classList.toggle('active', mode === 'normal');
+        document.getElementById('tab-awakening').classList.toggle('active', mode === 'awakening');
+        renderTable();
+    }
+
+    function renderTable() {
+        const data = CHAOS_DATA[currentMode];
+        const tbody = document.getElementById('chaosTable');
+        tbody.innerHTML = '';
+
+        data.forEach((item, idx) => {
+            const row = document.createElement('tr');
+            row.className = "hover:bg-slate-800/60 transition-colors";
+            row.innerHTML = `
+                <td class="px-6 py-5 text-center font-bold text-slate-200">${item.region}</td>
+                <td class="px-6 py-5 text-center">
+                    <input type="number" id="input-${idx}"
+                           class="chaos-input"
+                           placeholder="입력"
+                           oninput="calculateEfficiency(${idx}, ${item.base}, ${item.max})">
+                </td>
+                <td class="px-6 py-5 text-center text-slate-400 font-medium">${item.base.toLocaleString()}</td>
+                <td class="px-6 py-5 text-center text-slate-400 font-medium">${item.max.toLocaleString()}</td>
+                <td class="px-6 py-5 text-center">
+                    <span id="res-${idx}" class="result-percent text-slate-400">0%</span>
+                </td>
+            `;
+            tbody.appendChild(row);
+        });
+    }
+
+    function calculateEfficiency(idx, base, max) {
+        const input = document.getElementById(`input-${idx}`);
+        const result = document.getElementById(`res-${idx}`);
+        const val = parseInt(input.value) || 0;
+
+        if (val < base) {
+            result.textContent = "0%";
+            result.className = "result-percent text-slate-400";
+            return;
+        }
+
+        const efficiency = Math.min(100, ((val - base) / (max - base)) * 100);
+        result.textContent = Math.floor(efficiency) + "%";
+
+        if (efficiency >= 90) {
+            result.className = "result-percent text-orange-400 drop-shadow-[0_0_8px_#fb923c]";
+        } else if (efficiency >= 60) {
+            result.className = "result-percent text-emerald-400";
+        } else {
+            result.className = "result-percent text-slate-300";
+        }
+    }
+
+    function goToMenu() {
+        // index.html로 이동 (같은 폴더에 있다고 가정)
+        window.location.href = "index.html";
+    }
+
+    function resetAll() {
+        if (confirm("모든 입력값을 초기화하시겠습니까?")) {
+            renderTable();
+        }
+    }
+
+    window.onload = () => {
+        renderTable();
+    };
+</script>
+</body>
+</html>
