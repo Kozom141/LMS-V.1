@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>레만살 도구함</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&display=swap" rel="stylesheet">
+
+<style>
+
+/* ===== 배경 ===== */
+
+body {
+
+margin:0;
+height:100vh;
+
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+
+background:#020617;
+
+font-family:'Black Han Sans', sans-serif;
+
+overflow:hidden;
+
+color:white;
+
+}
+
+/* ===== 고급 배경 ===== */
+
+body::before {
+
+content:"";
+
+position:absolute;
+
+width:200%;
+height:200%;
+
+background:
+
+radial-gradient(circle at 20% 30%,
+rgba(56,189,248,0.15),
+transparent 40%),
+
+radial-gradient(circle at 80% 70%,
+rgba(139,92,246,0.15),
+transparent 40%),
+
+radial-gradient(circle at 40% 80%,
+rgba(255,60,60,0.12),
+transparent 40%);
+
+animation:bgMove 22s linear infinite;
+
+}
+
+@keyframes bgMove {
+
+0% { transform:translate(0,0); }
+50% { transform:translate(-20%,-25%); }
+100% { transform:translate(0,0); }
+
+}
+
+/* ===== 제목 줄 ===== */
+
+.title-row {
+
+display:flex;
+align-items:center;
+
+gap:18px;
+
+margin-bottom:60px;
+
+z-index:1;
+
+}
+
+/* ===== 3D 타이틀 ===== */
+
+.title {
+
+font-size:72px;
+
+color:#38bdf8;
+
+letter-spacing:2px;
+
+/* 입체 효과 */
+
+text-shadow:
+
+0px 2px 0px #0c4a6e,
+0px 4px 0px #083344,
+0px 6px 12px rgba(0,0,0,0.7);
+
+}
+
+/* ===== 단풍 ===== */
+
+.maple {
+
+width:70px;
+height:70px;
+
+transform-origin:center;
+
+/* 빛 효과 */
+
+filter:
+
+drop-shadow(0 0 6px rgba(255,80,80,0.7))
+drop-shadow(0 0 18px rgba(255,50,50,0.4));
+
+animation:leafFloat 3.2s ease-in-out infinite;
+
+}
+
+/* 흔들림 */
+
+@keyframes leafFloat {
+
+0% { transform:rotate(0deg); }
+
+50% { transform:rotate(7deg); }
+
+100% { transform:rotate(0deg); }
+
+}
+
+/* ===== 메뉴 ===== */
+
+.menu-container {
+
+display:flex;
+gap:28px;
+
+flex-wrap:wrap;
+
+justify-content:center;
+
+z-index:1;
+
+}
+
+/* ===== 카드 ===== */
+
+.menu-box {
+
+width:240px;
+height:150px;
+
+border-radius:22px;
+
+background:rgba(15,23,42,0.65);
+
+backdrop-filter:blur(14px);
+
+display:flex;
+flex-direction:column;
+
+justify-content:center;
+align-items:center;
+
+cursor:pointer;
+
+transition:0.25s;
+
+}
+
+/* 카드 색 */
+
+.menu-rebirth {
+
+border:1px solid rgba(56,189,248,0.5);
+
+box-shadow:0 0 14px rgba(56,189,248,0.25);
+
+}
+
+.menu-chaos {
+
+border:1px solid rgba(168,85,247,0.5);
+
+box-shadow:0 0 14px rgba(168,85,247,0.25);
+
+}
+
+.menu-star {
+
+border:1px solid rgba(234,179,8,0.5);
+
+box-shadow:0 0 14px rgba(234,179,8,0.25);
+
+}
+
+/* hover */
+
+.menu-box:hover {
+
+transform:translateY(-10px) scale(1.05);
+
+}
+
+/* 아이콘 */
+
+.menu-icon {
+
+font-size:40px;
+
+margin-bottom:12px;
+
+}
+
+/* 텍스트 */
+
+.menu-text {
+
+font-size:18px;
+
+font-weight:900;
+
+}
+
+/* ===== 모바일 ===== */
+
+@media(max-width:768px){
+
+.title {
+
+font-size:44px;
+
+}
+
+.maple {
+
+width:48px;
+height:48px;
+
+}
+
+.menu-box {
+
+width:85vw;
+max-width:320px;
+
+height:130px;
+
+}
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<!-- 제목 -->
+
+<div class="title-row">
+
+<div class="title">
+레만살 도구함
+</div>
+
+<!-- 🍁 실제 느낌 단풍 SVG -->
+
+<svg class="maple" viewBox="0 0 256 256">
+
+<defs>
+
+<linearGradient id="mapleGrad"
+x1="0%" y1="0%"
+x2="100%" y2="100%">
+
+<stop offset="0%" stop-color="#ff5a3c"/>
+<stop offset="50%" stop-color="#ff3b3b"/>
+<stop offset="100%" stop-color="#b91c1c"/>
+
+</linearGradient>
+
+</defs>
+
+<path
+fill="url(#mapleGrad)"
+d="
+M128 18
+
+C150 40 185 55 215 52
+C195 72 178 92 205 118
+
+C175 118 150 135 165 210
+
+C140 185 120 170 128 225
+
+C110 170 90 185 65 210
+
+C80 140 60 120 28 118
+
+C55 95 65 75 45 52
+
+C78 55 105 40 128 18
+
+Z"
+/>
+
+</svg>
+
+</div>
+
+<!-- 메뉴 -->
+
+<div class="menu-container">
+
+<div class="menu-box menu-rebirth"
+onclick="location.href='환생계산기.html'">
+
+<div class="menu-icon">🔄</div>
+<div class="menu-text">환생 계산기</div>
+
+</div>
+
+<div class="menu-box menu-chaos"
+onclick="location.href='혼돈의주문서효율표.html'">
+
+<div class="menu-icon">📜</div>
+<div class="menu-text">혼돈의 주문서 효율표</div>
+
+</div>
+
+<div class="menu-box menu-star"
+onclick="location.href='스타포스.html'">
+
+<div class="menu-icon">⭐</div>
+<div class="menu-text">스타포스 시뮬레이터</div>
+
+</div>
+
+</div>
+
+</body>
+</html>
