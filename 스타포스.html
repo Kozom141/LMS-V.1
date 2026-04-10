@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>레만살 │ 스타포스</title>
+    <title>레만살 │ 스타포스 시뮬레이터</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800;900&display=swap');
@@ -26,131 +26,111 @@
             backdrop-filter: blur(20px);
             border: 1px solid rgba(103, 232, 249, 0.3);
             border-radius: 20px;
-            box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.7);
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.6);
         }
        
         .star-btn {
-            width: 68px;
-            height: 68px;
-            font-size: 1.05rem;
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            font-size: 0.95rem;
             font-weight: 700;
             border: 2px solid #475569;
             background: rgba(30, 41, 59, 0.95);
             color: #cbd5e1;
-            border-radius: 16px;
+            border-radius: 14px;
             transition: all 0.2s;
         }
        
         .star-btn:hover {
             border-color: #67e8f9;
-            transform: scale(1.08);
+            transform: scale(1.05);
         }
        
         .star-btn.active {
             background: #67e8f9;
             color: #0f172a;
             border-color: #67e8f9;
-            box-shadow: 0 0 25px rgba(103, 232, 249, 0.7);
+            box-shadow: 0 0 20px rgba(103, 232, 249, 0.7);
         }
        
         .simulate-btn {
             background: linear-gradient(90deg, #f97316, #fb923c);
             color: white;
             font-weight: 900;
-            font-size: 1.35rem;
-            padding: 16px 50px;
+            font-size: 1.25rem;
+            padding: 16px 40px;
             border-radius: 9999px;
-            box-shadow: 0 0 30px rgba(249, 115, 22, 0.6);
-        }
-       
-        .result-card {
-            background: rgba(15, 23, 42, 0.95);
-            border: 2px solid #67e8f9;
-            border-radius: 20px;
-        }
-       
-        .result-box {
-            background: rgba(23, 32, 48, 0.8);
-            border: 1px solid #475569;
-            border-radius: 16px;
-            padding: 20px 16px;
+            box-shadow: 0 0 25px rgba(249, 115, 22, 0.6);
         }
     </style>
 </head>
-<body class="p-4 md:p-8 pb-32">
+<body class="p-4 md:p-6 pb-20">
 <div class="max-w-5xl mx-auto">
     <!-- Header -->
-    <header class="main-header flex items-center justify-between p-6 rounded-3xl mb-8">
-        <div class="flex items-center gap-4">
-            <div class="text-5xl">📜</div>
+    <header class="main-header flex items-center justify-between p-5 md:p-6 rounded-3xl mb-6">
+        <div class="flex items-center gap-3">
+            <div class="text-4xl md:text-5xl">📜</div>
             <div>
-                <h1 class="text-3xl md:text-4xl font-black tracking-tighter text-white">레만살 │ 스타포스</h1>
-                <p class="text-cyan-300 text-sm">Starforce Enhancement Simulator</p>
+                <h1 class="text-2xl md:text-3xl font-black tracking-tighter text-white">레만살 │ 스타포스 시뮬레이터</h1>
+                <p class="text-cyan-300 text-xs md:text-sm">Starforce Enhancement Simulator</p>
             </div>
         </div>
-        <button onclick="goToMenu()"
-                class="flex items-center gap-2 px-6 py-3 bg-slate-800 hover:bg-slate-700 border border-cyan-400 text-cyan-300 font-bold rounded-2xl transition-all">
+        <button onclick="goToMenu()" 
+                class="flex items-center gap-2 px-5 py-2.5 text-sm md:text-base bg-slate-800 hover:bg-slate-700 border border-cyan-400 text-cyan-300 font-bold rounded-2xl transition-all">
             ← 메뉴로 나가기
         </button>
     </header>
 
-    <div class="input-card p-8">
+    <div class="input-card p-5 md:p-8">
         <div class="mb-8">
-            <h2 class="text-xl font-bold text-cyan-300 mb-5 flex items-center gap-2">
+            <h2 class="text-lg md:text-xl font-bold text-cyan-300 mb-5 flex items-center gap-2">
                 <span>🎯</span> 목표 강화 단계 선택 (15성까지)
             </h2>
-            <div id="starButtons" class="grid grid-cols-5 gap-4"></div>
+            <div id="starButtons" class="grid grid-cols-5 gap-3"></div>
         </div>
 
         <div class="flex justify-center mb-10">
             <button onclick="startSimulation()" id="simulateBtn"
-                    class="simulate-btn flex items-center gap-3 disabled:opacity-50" disabled>
+                    class="simulate-btn flex items-center gap-3 w-full md:w-auto disabled:opacity-50" disabled>
                 <span>🚀</span> 강화시작
             </button>
         </div>
 
         <!-- 결과 영역 -->
-        <div id="resultArea" class="result-card p-8 hidden">
+        <div id="resultArea" class="result-card p-6 md:p-8 hidden">
             <div class="flex items-center justify-center gap-2 mb-6 text-emerald-400 font-bold">
                 <span class="text-2xl">✅</span>
-                <span class="text-xl">시뮬레이션 완료</span>
+                <span class="text-lg md:text-xl">시뮬레이션 완료</span>
             </div>
             
             <div class="grid grid-cols-2 gap-4">
-                <!-- 1. 도달 스타포스 공격력 -->
-                <div class="result-box text-center">
-                    <p class="text-slate-400 text-sm mb-2">도달 스타포스 공격력</p>
-                    <p id="finalAttack" class="text-5xl font-black text-white">0.00%</p>
+                <div class="result-box text-center p-5">
+                    <p class="text-slate-400 text-xs md:text-sm mb-2">도달 스타포스 공격력</p>
+                    <p id="finalAttack" class="text-4xl md:text-5xl font-black text-white">0.00%</p>
                 </div>
-                
-                <!-- 2. 이번 시뮬레이션 사용 흔적 -->
-                <div class="result-box text-center">
-                    <p class="text-slate-400 text-sm mb-2">사용된 주문의 흔적</p>
-                    <p id="usedTraces" class="text-5xl font-black text-amber-400">0 개</p>
+                <div class="result-box text-center p-5">
+                    <p class="text-slate-400 text-xs md:text-sm mb-2">사용된 주문의 흔적</p>
+                    <p id="usedTraces" class="text-4xl md:text-5xl font-black text-amber-400">0 개</p>
                 </div>
-                
-                <!-- 3. 시뮬레이션 실행 횟수 -->
-                <div class="result-box text-center">
-                    <p class="text-slate-400 text-sm mb-2">시뮬레이션 실행 횟수</p>
-                    <p id="totalSimCount" class="text-5xl font-black text-cyan-300">0 회</p>
+                <div class="result-box text-center p-5">
+                    <p class="text-slate-400 text-xs md:text-sm mb-2">시뮬레이션 실행 횟수</p>
+                    <p id="totalSimCount" class="text-4xl md:text-5xl font-black text-cyan-300">0 회</p>
                 </div>
-                
-                <!-- 4. 사용된 주문의 흔적 평균 -->
-                <div class="result-box text-center">
-                    <p class="text-slate-400 text-sm mb-2">사용된 주문의 흔적 평균</p>
-                    <p id="avgTraces" class="text-5xl font-black text-violet-400">0 개</p>
+                <div class="result-box text-center p-5">
+                    <p class="text-slate-400 text-xs md:text-sm mb-2">사용된 주문의 흔적 평균</p>
+                    <p id="avgTraces" class="text-4xl md:text-5xl font-black text-violet-400">0 개</p>
                 </div>
             </div>
 
-            <div class="mt-10 text-center">
-                <button onclick="resetSimulation()"
-                        class="px-10 py-4 bg-slate-700 hover:bg-slate-600 rounded-2xl font-bold transition-all">
+            <div class="mt-8 text-center">
+                <button onclick="resetSimulation()" 
+                        class="px-8 py-4 bg-slate-700 hover:bg-slate-600 rounded-2xl font-bold w-full md:w-auto">
                     다시 시뮬레이션
                 </button>
             </div>
         </div>
 
-        <div id="waitingArea" class="text-center py-16 text-slate-400 text-lg">
+        <div id="waitingArea" class="text-center py-12 md:py-16 text-slate-400">
             목표 단계를 선택한 후<br>강화시작 버튼을 눌러주세요
         </div>
     </div>
@@ -205,8 +185,6 @@
 
     function selectTarget(star) {
         selectedTarget = star;
-        
-        // 성 변경 시 통계 초기화
         totalSimulations = 0;
         totalTracesUsed = 0;
         
@@ -231,9 +209,7 @@
         let thisSimTraces = 0;
         let attempts = 0;
 
-        const maxAttempts = 200000;
-
-        while (currentStar < target && attempts < maxAttempts) {
+        while (currentStar < target && attempts < 200000) {
             attempts++;
             const nextStar = currentStar + 1;
             thisSimTraces += STAR_DATA[nextStar].cost;
@@ -247,14 +223,12 @@
             }
         }
 
-        // 전체 통계 업데이트
         totalSimulations++;
         totalTracesUsed += thisSimTraces;
 
         const attackPercent = STAR_DATA[target].attack.toFixed(2);
         const avgTraces = totalSimulations > 0 ? (totalTracesUsed / totalSimulations).toFixed(1) : 0;
 
-        // 결과 표시
         document.getElementById('finalAttack').textContent = `${attackPercent}%`;
         document.getElementById('usedTraces').textContent = `${formatNumber(thisSimTraces)} 개`;
         document.getElementById('totalSimCount').textContent = `${formatNumber(totalSimulations)} 회`;
