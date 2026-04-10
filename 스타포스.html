@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>레만살 │ 스타포스</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800;900&display=swap');
+       
+        body {
+            font-family: 'Pretendard', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e2937 100%);
+            color: #e2e8f0;
+            min-height: 100vh;
+        }
+       
+        .main-header {
+            background: rgba(15, 23, 42, 0.95);
+            border: 2px solid #67e8f9;
+            box-shadow: 0 0 30px rgba(103, 232, 249, 0.3);
+        }
+       
+        .input-card {
+            background: rgba(15, 23, 42, 0.92);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(103, 232, 249, 0.3);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.7);
+        }
+       
+        .star-btn {
+            width: 68px;
+            height: 68px;
+            font-size: 1.05rem;
+            font-weight: 700;
+            border: 2px solid #475569;
+            background: rgba(30, 41, 59, 0.95);
+            color: #cbd5e1;
+            border-radius: 16px;
+            transition: all 0.2s;
+        }
+       
+        .star-btn:hover {
+            border-color: #67e8f9;
+            transform: scale(1.08);
+        }
+       
+        .star-btn.active {
+            background: #67e8f9;
+            color: #0f172a;
+            border-color: #67e8f9;
+            box-shadow: 0 0 25px rgba(103, 232, 249, 0.7);
+        }
+       
+        .simulate-btn {
+            background: linear-gradient(90deg, #f97316, #fb923c);
+            color: white;
+            font-weight: 900;
+            font-size: 1.35rem;
+            padding: 16px 50px;
+            border-radius: 9999px;
+            box-shadow: 0 0 30px rgba(249, 115, 22, 0.6);
+        }
+       
+        .result-card {
+            background: rgba(15, 23, 42, 0.95);
+            border: 2px solid #67e8f9;
+            border-radius: 20px;
+        }
+       
+        .result-box {
+            background: rgba(23, 32, 48, 0.8);
+            border: 1px solid #475569;
+            border-radius: 16px;
+            padding: 20px 16px;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8 pb-32">
+<div class="max-w-5xl mx-auto">
+    <!-- Header -->
+    <header class="main-header flex items-center justify-between p-6 rounded-3xl mb-8">
+        <div class="flex items-center gap-4">
+            <div class="text-5xl">📜</div>
+            <div>
+                <h1 class="text-3xl md:text-4xl font-black tracking-tighter text-white">레만살 │ 스타포스</h1>
+                <p class="text-cyan-300 text-sm">Starforce Enhancement Simulator</p>
+            </div>
+        </div>
+        <button onclick="goToMenu()"
+                class="flex items-center gap-2 px-6 py-3 bg-slate-800 hover:bg-slate-700 border border-cyan-400 text-cyan-300 font-bold rounded-2xl transition-all">
+            ← 메뉴로 나가기
+        </button>
+    </header>
+
+    <div class="input-card p-8">
+        <div class="mb-8">
+            <h2 class="text-xl font-bold text-cyan-300 mb-5 flex items-center gap-2">
+                <span>🎯</span> 목표 강화 단계 선택 (15성까지)
+            </h2>
+            <div id="starButtons" class="grid grid-cols-5 gap-4"></div>
+        </div>
+
+        <div class="flex justify-center mb-10">
+            <button onclick="startSimulation()" id="simulateBtn"
+                    class="simulate-btn flex items-center gap-3 disabled:opacity-50" disabled>
+                <span>🚀</span> 강화시작
+            </button>
+        </div>
+
+        <!-- 결과 영역 -->
+        <div id="resultArea" class="result-card p-8 hidden">
+            <div class="flex items-center justify-center gap-2 mb-6 text-emerald-400 font-bold">
+                <span class="text-2xl">✅</span>
+                <span class="text-xl">시뮬레이션 완료</span>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4">
+                <!-- 1. 도달 스타포스 공격력 -->
+                <div class="result-box text-center">
+                    <p class="text-slate-400 text-sm mb-2">도달 스타포스 공격력</p>
+                    <p id="finalAttack" class="text-5xl font-black text-white">0.00%</p>
+                </div>
+                
+                <!-- 2. 이번 시뮬레이션 사용 흔적 -->
+                <div class="result-box text-center">
+                    <p class="text-slate-400 text-sm mb-2">사용된 주문의 흔적</p>
+                    <p id="usedTraces" class="text-5xl font-black text-amber-400">0 개</p>
+                </div>
+                
+                <!-- 3. 시뮬레이션 실행 횟수 -->
+                <div class="result-box text-center">
+                    <p class="text-slate-400 text-sm mb-2">시뮬레이션 실행 횟수</p>
+                    <p id="totalSimCount" class="text-5xl font-black text-cyan-300">0 회</p>
+                </div>
+                
+                <!-- 4. 사용된 주문의 흔적 평균 -->
+                <div class="result-box text-center">
+                    <p class="text-slate-400 text-sm mb-2">사용된 주문의 흔적 평균</p>
+                    <p id="avgTraces" class="text-5xl font-black text-violet-400">0 개</p>
+                </div>
+            </div>
+
+            <div class="mt-10 text-center">
+                <button onclick="resetSimulation()"
+                        class="px-10 py-4 bg-slate-700 hover:bg-slate-600 rounded-2xl font-bold transition-all">
+                    다시 시뮬레이션
+                </button>
+            </div>
+        </div>
+
+        <div id="waitingArea" class="text-center py-16 text-slate-400 text-lg">
+            목표 단계를 선택한 후<br>강화시작 버튼을 눌러주세요
+        </div>
+    </div>
+</div>
+
+<script>
+    const STAR_DATA = [
+        null,
+        { star: 1,  attack: 0.03, cost: 1000 },
+        { star: 2,  attack: 0.13, cost: 2000 },
+        { star: 3,  attack: 0.29, cost: 4000 },
+        { star: 4,  attack: 0.51, cost: 8000 },
+        { star: 5,  attack: 0.80, cost: 16000 },
+        { star: 6,  attack: 1.15, cost: 32000 },
+        { star: 7,  attack: 1.57, cost: 64000 },
+        { star: 8,  attack: 2.05, cost: 100000 },
+        { star: 9,  attack: 2.59, cost: 150000 },
+        { star: 10, attack: 3.20, cost: 200000 },
+        { star: 11, attack: 3.87, cost: 250000 },
+        { star: 12, attack: 4.61, cost: 300000 },
+        { star: 13, attack: 5.41, cost: 350000 },
+        { star: 14, attack: 6.27, cost: 400000 },
+        { star: 15, attack: 7.20, cost: 450000 }
+    ];
+
+    function getSuccessProb(nextStar) {
+        if (nextStar <= 1) return 1.00;
+        if (nextStar === 2) return 0.90;
+        if (nextStar === 3) return 0.80;
+        if (nextStar === 4) return 0.70;
+        if (nextStar === 5) return 0.60;
+        if (nextStar <= 10) return 0.50;
+        return 0.30;
+    }
+
+    let selectedTarget = null;
+    let totalSimulations = 0;
+    let totalTracesUsed = 0;
+
+    function createStarButtons() {
+        const container = document.getElementById('starButtons');
+        container.innerHTML = '';
+        
+        for (let i = 1; i <= 15; i++) {
+            const btn = document.createElement('button');
+            btn.className = 'star-btn';
+            btn.textContent = `${i}성`;
+            btn.onclick = () => selectTarget(i);
+            container.appendChild(btn);
+        }
+    }
+
+    function selectTarget(star) {
+        selectedTarget = star;
+        
+        // 성 변경 시 통계 초기화
+        totalSimulations = 0;
+        totalTracesUsed = 0;
+        
+        document.querySelectorAll('.star-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.star-btn')[star-1].classList.add('active');
+        
+        document.getElementById('simulateBtn').disabled = false;
+        
+        document.getElementById('resultArea').classList.add('hidden');
+        document.getElementById('waitingArea').classList.remove('hidden');
+    }
+
+    function formatNumber(num) {
+        return num.toLocaleString('ko-KR');
+    }
+
+    function startSimulation() {
+        if (!selectedTarget) return;
+
+        const target = selectedTarget;
+        let currentStar = 0;
+        let thisSimTraces = 0;
+        let attempts = 0;
+
+        const maxAttempts = 200000;
+
+        while (currentStar < target && attempts < maxAttempts) {
+            attempts++;
+            const nextStar = currentStar + 1;
+            thisSimTraces += STAR_DATA[nextStar].cost;
+
+            if (Math.random() < getSuccessProb(nextStar)) {
+                currentStar = nextStar;
+            } else {
+                if (Math.random() < 0.5 && currentStar > 0) {
+                    currentStar--;
+                }
+            }
+        }
+
+        // 전체 통계 업데이트
+        totalSimulations++;
+        totalTracesUsed += thisSimTraces;
+
+        const attackPercent = STAR_DATA[target].attack.toFixed(2);
+        const avgTraces = totalSimulations > 0 ? (totalTracesUsed / totalSimulations).toFixed(1) : 0;
+
+        // 결과 표시
+        document.getElementById('finalAttack').textContent = `${attackPercent}%`;
+        document.getElementById('usedTraces').textContent = `${formatNumber(thisSimTraces)} 개`;
+        document.getElementById('totalSimCount').textContent = `${formatNumber(totalSimulations)} 회`;
+        document.getElementById('avgTraces').textContent = `${formatNumber(parseFloat(avgTraces))} 개`;
+
+        document.getElementById('resultArea').classList.remove('hidden');
+        document.getElementById('waitingArea').classList.add('hidden');
+    }
+
+    function resetSimulation() {
+        document.getElementById('resultArea').classList.add('hidden');
+        document.getElementById('waitingArea').classList.remove('hidden');
+    }
+
+    function goToMenu() {
+        window.location.href = "index.html";
+    }
+
+    window.onload = () => {
+        createStarButtons();
+    };
+</script>
+</body>
+</html>
